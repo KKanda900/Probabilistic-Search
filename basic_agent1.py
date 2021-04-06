@@ -128,7 +128,7 @@ class Basic_Agent_1:
         moves_counted=0
         distance=0
         while self.target_found==False:
-            if (x_cord,y_cord)==self.target_info.location:
+             if (x_cord,y_cord)==self.target_info.location and self.belief_state[x_cord][y_cord]==1-self.map_board[x_cord][y_cord].terrian_type.false_neg:
                 moves_counted+=1
                 self.target_found=True
             else:
