@@ -1,5 +1,5 @@
 import numpy, sys, random, math
-from Terrains import Terrians
+from Terrain import Terrians
 from Target import Target
 
 class Basic_Agent_1:
@@ -62,10 +62,11 @@ class Basic_Agent_1:
                 else:
                     # if the other case isn't true that means we are at every other cell
                     if self.belief_state[x][y] == 0:
-                        self.belief_state[x][y]+=1
+                        self.belief_state[x][y]+=.01
                     elif self.belief_state[x][y] > 0: # otherwise keep lowering the probability until we get back to the sum being 1
-                        self.belief_state[x][y]-=1
-                        if sum(self.belief_state) == 1:
+                        self.belief_state[x][y]-=.01
+                        print(sum(self.belief_state).any())
+                        if sum(self.belief_state).any() == 1:
                             sum_equal_1 = True
                             break
                         else:
@@ -105,6 +106,7 @@ class Basic_Agent_1:
             elif min_distance==distance:
                 ties.append((x_cord,y_cord))
         return ties[0]
+
     def calculate_location(self,board):
         location=()
         ties=[]
@@ -119,7 +121,6 @@ class Basic_Agent_1:
                 elif board[i][j]==max_val:
                     ties.append((i,j))
         return ties
-
 
     def basic_agent(self,x,y):
         x_cord=x

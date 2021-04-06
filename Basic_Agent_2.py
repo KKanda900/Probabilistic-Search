@@ -30,7 +30,7 @@ class Basic_Agent_2:
         terrian_type = self.map_board[target_location[0]][target_location[1]].terrian_type
         self.target_info = Target(target_location[0], target_location[1], terrian_type)
 
-    # update the belief state based on bayesian updating
+    # update the belief state based on bayesian updating (for basic agent 1)
     def bayesian_update(self, x, y):
         '''
         For Bayes updating we want to update the belief state with P(Target in Cell i | Observations at t and Failure in Cell j)
@@ -42,12 +42,12 @@ class Basic_Agent_2:
         # update the probability of failure for the previous cell
         curr_prev = self.previous_cells.pop(0)
         prob_failure = 1 - (self.belief_state[curr_prev[0]][curr_prev[1]])
-        # obtain the false negative probability for the cell
-        fnr = self.map_board[x][y].false_neg
+        # obtain the probability of the previous cell failing and the target is in the current cell
+        fnr = 1 # always 1
         # obtain the probability of the target being in the location based on the observation
         curr_belief = self.belief_state[x][y]
         # update the probability of the current cell
-        self.belief_state[x][y] = (curr_belief*fnr)/(prob_failure)
+        self.belief_state[x][y] = (curr_belief*1)/(prob_failure)
 
         '''
         Step 2: Update the remaining probabilities so everything is equal to 1
@@ -73,5 +73,18 @@ class Basic_Agent_2:
             
             if sum_equal_1 == True:
                 break
+    
+    def bayesian_update_v1(self, x, y):
+        '''
+        For Bayes updating we want to update the belief state with P(target found in cell_i | Observations_t)
+        '''
+
+        '''
+        Step 1: 
+        '''
+    
+    # start basic agent 2 here
+    def basic_agent_2(self):
+        print("Work on this tomorrow")
 
     
