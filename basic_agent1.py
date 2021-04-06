@@ -144,6 +144,7 @@ class Basic_Agent_1:
                 distance+=abs(x_cord-coords[0])+abs(y_cord-coords[1])
                 x_cord=coords[0]
                 y_cord=coords[1]
+
         return moves_counted+distance        
 
 x=random.randint(0,50)
