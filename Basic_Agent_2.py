@@ -2,6 +2,7 @@ import numpy, sys, random, math
 from Terrain import Terrians
 from Target import Target
 
+
 class Basic_Agent_2:
     
     # information to store about the generated map
