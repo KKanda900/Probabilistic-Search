@@ -32,6 +32,7 @@ class Basic_Agent_1:
 
     # update the belief state based on bayesian updating
     def bayesian_update(self, x, y):
+
         '''
         For Bayes updating we want to update the belief state with P(Target in Cell i | Observations at t and Failure in Cell j)
         '''
@@ -41,39 +42,26 @@ class Basic_Agent_1:
         '''
         # update the probability of failure for the previous cell
         curr_prev = self.previous_cells.pop(0)
-        prob_failure = 1 - (self.belief_state[curr_prev[0]][curr_prev[1]])
-        # obtain the false negative probability for the cell
-        fnr = self.map_board[x][y].false_neg
+        # obtain the probability of the previous cell failing and the target is in the current cell
+        fnr = self.map_board[x][y].false_neg  # FNR of current cell
         # obtain the probability of the target being in the location based on the observation
-        curr_belief = self.belief_state[x][y]
+        curr_cell_belief = self.belief_state[x][y]
+        prob_failure = (fnr * curr_cell_belief) + (1 - curr_cell_belief)
         # update the probability of the current cell
-        self.belief_state[x][y] = (curr_belief*fnr)/(prob_failure)
+        # self.belief_state[x][y] = curr_cell_belief/prob_failure
 
         '''
         Step 2: Update the remaining probabilities so everything is equal to 1
         '''
         # go to each cell and make sure the total probability equals 1
         for i in range(self.dim):
-            sum_equal_1 = False
             for j in range(self.dim):
-                # if the i == x and j == y that means we are at the coordinate we just updated and we can just skip that
-                if i == x and j == y:
-                    pass
+                # if the false negative rates are same we have same terrain cell as the one search failed on in last step
+                if fnr == self.map_board[i][j].false_neg:
+                    self.belief_state[i][j] = (fnr * self.belief_state[i][j]) / prob_failure
                 else:
                     # if the other case isn't true that means we are at every other cell
-                    if self.belief_state[x][y] == 0:
-                        self.belief_state[x][y]+=.01
-                    elif self.belief_state[x][y] > 0: # otherwise keep lowering the probability until we get back to the sum being 1
-                        self.belief_state[x][y]-=.01
-                        print(sum(self.belief_state).any())
-                        if sum(self.belief_state).any() == 1:
-                            sum_equal_1 = True
-                            break
-                        else:
-                            pass
-            
-            if sum_equal_1 == True:
-                break
+                    self.belief_state[i][j] = self.belief_state[i][j] / prob_failure
 
     def calculate_neighbors(self,x,y):
         neighbors=[]
@@ -128,10 +116,10 @@ class Basic_Agent_1:
         moves_counted=0
         distance=0
         while self.target_found==False:
-             if (x_cord,y_cord)==self.target_info.location and self.belief_state[x_cord][y_cord]==1-self.map_board[x_cord][y_cord].terrian_type.false_neg:
+             if (x_cord,y_cord)==self.target_info.location and self.belief_state[x_cord][y_cord]==1-self.map_board[x_cord][y_cord].false_neg:
                 moves_counted+=1
                 self.target_found=True
-            else:
+             else:
                 self.previous_cells.append((x_cord,y_cord))
                 moves_counted+=1
                 self.bayesian_update(x_cord,y_cord)
