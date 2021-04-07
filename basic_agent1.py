@@ -70,25 +70,7 @@ class Basic_Agent_1:
                     self.belief_state[i][j] = (fnr * self.belief_state[i][j]) / prob_failure
                 else:
                     # if the other case isn't true that means we are at every other cell
-<<<<<<< HEAD
-                    if self.belief_state[x][y] == 0:
-                        self.belief_state[x][y] += (1/self.dim)
-                    # otherwise keep lowering the probability until we get back to the sum being 1
-                    elif self.belief_state[x][y] > 0:
-                        if self.belief_state[x][y] != 0:
-                            self.belief_state[x][y] -= (1/self.dim)
-                        print(sum(self.belief_state).any())
-                        if sum(self.belief_state).any() == 1:
-                            sum_equal_1 = True
-                            break
-                        else:
-                            pass
-
-            if sum_equal_1 == True:
-                break
-=======
                     self.belief_state[i][j] = self.belief_state[i][j] / prob_failure
->>>>>>> 014a2ff30f62e7f684b206c520681f1326900c10
 
     def calculate_neighbors(self, x, y):
         neighbors = []
@@ -137,18 +119,6 @@ class Basic_Agent_1:
                     ties.append((i, j))
         return ties
 
-<<<<<<< HEAD
-    def basic_agent(self, x, y):
-        x_cord = x
-        y_cord = y
-        moves_counted = 0
-        distance = 0
-        while self.target_found == False:
-            if (x_cord, y_cord) == self.target_info.location:
-                moves_counted += 1
-                self.target_found = True
-            else:
-=======
     def basic_agent(self,x,y):
         x_cord=x
         y_cord=y
@@ -159,7 +129,6 @@ class Basic_Agent_1:
                 moves_counted+=1
                 self.target_found=True
              else:
->>>>>>> 014a2ff30f62e7f684b206c520681f1326900c10
                 self.previous_cells.append((x_cord,y_cord))
                 moves_counted+=1
                 self.bayesian_update(x_cord,y_cord)

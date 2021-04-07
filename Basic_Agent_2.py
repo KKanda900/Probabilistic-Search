@@ -180,3 +180,9 @@ class Basic_Agent_2:
                                     # if the condition above isn't true that means we can use smallest_coord effectively
                                     x = smallest_coord[0]
                                     y = smallest_coord[1]
+
+# start the basic agent 2 process here
+if __name__ == "__main__":
+    agent = Basic_Agent_2(50)
+    indicies = list(range(0, agent.dim))  # create a list of numbers to choose from
+    agent.start_agent(random.choice(indicies), random.choice(indicies))
