@@ -2,7 +2,7 @@ import numpy
 import sys
 import random
 import math
-from Terrain import Terrian
+from Terrain import Terrians
 from Target import Target
 
 
@@ -27,7 +27,7 @@ class Basic_Agent_1:
         for i in range(0, self.dim):
             for j in range(0, self.dim):
                 # if the target location == i and j then occupy i, j with the target
-                self.map_board[i][j] = Terrian(i, j)
+                self.map_board[i][j] = Terrians(i, j)
                 self.belief_state[i][j] = 1/(self.dim*self.dim)
 
         # generate a random spot for the target to be located
