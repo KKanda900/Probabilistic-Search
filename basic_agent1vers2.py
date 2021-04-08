@@ -14,6 +14,11 @@ class Basic_Agent_1:
     # stores all the information about the previous cells here in the form (x, y)
     previous_cells = []
     target_found = False
+    flat = {"num": 0, "prob": 0, "false_n": .1}
+    hilly = {"num": 0, "prob": 0, "false_n": .3}
+    forest = {"num": 0, "prob": 0, "false_n": .7}
+    caves = {"num": 0, "prob": 0, "false_n": .9}
+
 
     def __init__(self, dim):
         self.dim = dim
@@ -28,15 +33,30 @@ class Basic_Agent_1:
             for j in range(0, self.dim):
                 # if the target location == i and j then occupy i, j with the target
                 self.map_board[i][j] = Terrians(i, j)
+                if self.map_board[i][j].terrain_type == 'flat':
+                    self.flat["num"] += 1
+                elif self.map_board[i][j].terrain_type == 'hilly':
+                    self.hilly["num"] += 1
+                elif self.map_board[i][j].terrain_type == 'forested':
+                    self.forest["num"] += 1
+                else:
+                    self.caves["num"] += 1
                 self.belief_state[i][j] = 1/(self.dim*self.dim)
+
+        print(self.belief_state.sum())
 
         # generate a random spot for the target to be located
         indicies = list(range(0, self.dim))
         target_location = (random.choice(indicies), random.choice(indicies))
-        terrian_type = self.map_board[target_location[0]
-            ][target_location[1]].terrian_type
+        terrain_type = self.map_board[target_location[0]
+            ][target_location[1]].terrain_type
         self.target_info = Target(
-            target_location[0], target_location[1], terrian_type)
+            target_location[0], target_location[1], terrain_type)
+
+        self.flat["prob"] = self.flat["num"] / (self.dim*self.dim)
+        self.hilly["prob"] = self.hilly["num"] / (self.dim*self.dim)
+        self.forest["prob"] = self.forest["num"] / (self.dim*self.dim)
+        self.caves["prob"] = self.caves["num"] / (self.dim*self.dim)
 
     # update the belief state based on bayesian updating
     def bayesian_update(self, x, y):
@@ -48,15 +68,44 @@ class Basic_Agent_1:
         '''
         Step 1: Update the current cell then update the rest of the cells according to the cell
         '''
-        # update the probability of failure for the previous cell
-        curr_prev = self.previous_cells.pop(0)
+
         # obtain the probability of the previous cell failing and the target is in the current cell
         fnr = self.map_board[x][y].false_neg  # FNR of current cell
-        # obtain the probability of the target being in the location based on the observation
-        curr_cell_belief = self.belief_state[x][y]
-        prob_failure = (fnr * curr_cell_belief) + (1 - curr_cell_belief)
-        # update the probability of the current cell
-        # self.belief_state[x][y] = curr_cell_belief/prob_failure
+        terrain = self.map_board[x][y].terrain_type
+        print(terrain)
+        # obtain the probability of the target being in the terrain location based on the observation
+        if terrain == 'flat':
+            curr_cell_belief = self.flat["prob"]
+        elif terrain == 'hilly':
+            curr_cell_belief = self.hilly["prob"]
+        elif terrain == 'forested':
+            curr_cell_belief = self.forest["prob"]
+        else:
+            curr_cell_belief = self.caves["prob"]
+
+        prob_failure = ((fnr * curr_cell_belief) + (1 - curr_cell_belief))
+
+        # if the we have same terrain cell as the one last search failed on we use different equation
+
+        if terrain != 'flat':
+            self.flat["prob"] = self.flat["prob"] / prob_failure
+        if terrain != 'hilly':
+            self.hilly["prob"] = self.hilly["prob"] / prob_failure
+        if terrain != 'forested':
+            self.forest["prob"] = self.forest["prob"] / prob_failure
+        if terrain != 'caves':
+            self.caves["prob"] = self.caves["prob"] / prob_failure
+
+        # now we calculate the new probability for the same terrain as last cell
+        if terrain == 'flat':
+            self.flat["prob"] = fnr * self.flat["prob"] / prob_failure
+        if terrain == 'hilly':
+            self.hilly["prob"] = fnr * self.hilly["prob"] / prob_failure
+        if terrain == 'forested':
+            self.forest["prob"] = fnr * self.forest["prob"] / prob_failure
+        if terrain == 'caves':
+            self.caves["prob"] = fnr * self.caves["prob"] / prob_failure
+
 
         '''
         Step 2: Update the remaining probabilities so everything is equal to 1
@@ -65,22 +114,28 @@ class Basic_Agent_1:
         sum_equal_1 = False
         for i in range(self.dim):
             for j in range(self.dim):
-                # if the false negative rates are same we have same terrain cell as the one search failed on in last step
-                if fnr == self.map_board[i][j].false_neg:
-                    self.belief_state[i][j] = (fnr * self.belief_state[i][j]) / prob_failure
+                terrain = self.map_board[i][j].terrain_type
+                if terrain == 'flat':
+                    self.belief_state[i][j] = self.flat["prob"] / self.flat["num"]
+                elif terrain == 'hilly':
+                    self.belief_state[i][j] = self.hilly["prob"] / self.hilly["num"]
+                elif terrain == 'forested':
+                    self.belief_state[i][j] = self.forest["prob"] / self.forest["num"]
                 else:
+                    self.belief_state[i][j] = self.caves["prob"] / self.caves["num"]
                     # if the other case isn't true that means we are at every other cell
-                    self.belief_state[i][j] = self.belief_state[i][j] / prob_failure
+
+        print(self.belief_state.sum())
 
     def calculate_neighbors(self, x, y):
         neighbors = []
-        if x+1 < 50 and y < 50:
+        if x+1 < self.dim and y < self.dim:
             neighbors.append((x+1, y))
-        if x < 50 and y+1 < 50:
+        if x < self.dim and y+1 < self.dim:
             neighbors.append((x, y+1))
-        if x-1 < 50 and y < 50:
+        if x-1 < self.dim and y < self.dim:
             neighbors.append((x-1, y))
-        if x < 50 and y-1 < 50:
+        if x < self.dim and y-1 < self.dim:
             neighbors.append((x, y-1))
         return neighbors
 
@@ -113,8 +168,8 @@ class Basic_Agent_1:
         location = ()
         ties = []
         max_val = 0.0
-        for i in range(0, 50):
-            for j in range(0, 50):
+        for i in range(0, self.dim):
+            for j in range(0, self.dim):
                 if board[i][j] > max_val:
                     max_val = board[i][j]
                     location = (i, j)
@@ -141,7 +196,7 @@ class Basic_Agent_1:
                 moves_counted+=1
                 self.bayesian_update(x_cord,y_cord)
                 locations=self.calculate_location(self.belief_state)
-                print(locations)
+                #print(locations)
                 if len(locations)>1:
                     location=self.clear_ties(locations,x_cord,y_cord)
                     locations.clear()
@@ -153,8 +208,8 @@ class Basic_Agent_1:
 
         return moves_counted+distance        
 
-x=random.randint(0,50)
-y=random.randint(0,50)
-info=Basic_Agent_1(50)
-print(info.basic_agent(x,y))           
+x=random.randint(0,4)
+y=random.randint(0,4)
+info=Basic_Agent_1(5)
+print(info.basic_agent(x,y))
 # self.start()
