@@ -46,6 +46,7 @@ class Basic_Agent_2:
     
     # update the belief state based on bayesian updating (for basic agent 2)
     def bayesian_update(self, x, y):
+
         '''
         For Bayes updating we want to update the belief state with P(Target in Cell i | Observations at t and Failure in Cell j)
         '''
@@ -53,40 +54,30 @@ class Basic_Agent_2:
         '''
         Step 1: Update the current cell then update the rest of the cells according to the cell
         '''
-        # update the probability of failure for the previous cell
-        curr_prev = self.previous_cells.pop(0)
         # obtain the probability of the previous cell failing and the target is in the current cell
         fnr = self.map_board[x][y].false_neg  # FNR of current cell
         # obtain the probability of the target being in the location based on the observation
         curr_cell_belief = self.belief_state[x][y]
         prob_failure = (fnr * curr_cell_belief) + (1 - curr_cell_belief)
+        # update the probability of the current cell
+        self.belief_state[x][y] = (fnr*curr_cell_belief)/prob_failure
+        self.confidence_state[x][y] = curr_cell_belief * (1 - fnr)
+        print("point:", x, y)
+        print("belief[x][y]:", self.belief_state[x][y])
 
         '''
-        Step 2: Update the remaining probabilities and Step 3: Update the confidence states for the current cell
+        Step 2: Update the remaining probabilities so everything is equal to 1
         '''
         # go to each cell and make sure the total probability equals 1
+
         for i in range(self.dim):
             for j in range(self.dim):
-                # if the false negative rates are same we have same terrain cell as the one search failed on in last step
-                if fnr == self.map_board[i][j].false_neg:
-                    self.belief_state[i][j] = (fnr * self.belief_state[i][j]) / prob_failure
-                    
-                    # obtain the probability of the Target being in Cell_i given the Observations at time t
-                    curr_belief = self.belief_state[i][j]
-                    # obtain the probability of Success in Cell_i given the Obseravations at time t
-                    current_success = 1-self.map_board[i][j].false_neg
-                    # update the current confidence state
-                    self.confidence_state[i][j] = curr_belief*current_success
-                else:
-                    # if the other case isn't true that means we are at every other cell
-                    self.belief_state[i][j] = self.belief_state[i][j] / prob_failure
+                if (i, j) != (x, y):
+                    self.belief_state[i][j] /= prob_failure
+                    self.confidence_state[i][j] = self.belief_state[i][j] * (1 - self.map_board[i][i].false_neg)
 
-                    # obtain the probability of the Target being in Cell_i given the Observations at time t
-                    curr_belief = self.belief_state[i][j]
-                    # obtain the probability of Success in Cell_i given the Obseravations at time t
-                    current_success = 1-self.map_board[i][j].false_neg
-                    # update the current confidence state
-                    self.confidence_state[i][j] = curr_belief*current_success
+        print("sum", self.belief_state.sum())
+
     def clear_ties(self, board, x, y):
         min_distance = 0.0
         ties = []
@@ -114,8 +105,8 @@ class Basic_Agent_2:
         location = ()
         ties = []
         max_val = 0.0
-        for i in range(0, 50):
-            for j in range(0, 50):
+        for i in range(0, self.dim):
+            for j in range(0, self.dim):
                 if board[i][j] > max_val:
                     max_val = board[i][j]
                     location = (i, j)
@@ -132,7 +123,7 @@ class Basic_Agent_2:
         target_found = False
 
         # iterate through every cell over and over until the target is found
-        while target_found == False:
+        while target_found is False:
 
             # if the target is found immediately exit out of the loop and return the results
             if (x, y) == self.target_info.location:
@@ -145,7 +136,7 @@ class Basic_Agent_2:
                     self.bayesian_update(x, y)
 
                     # now iterate through all the cells that when i != x and j != y to find the new highest probabilities
-                    locations=self.calculate_location(self.belief_state)
+                    locations = self.calculate_location(self.confidence_state)
                     if len(locations)>1:
                         location=self.clear_ties(locations,x,y) 
                         locations.clear()
