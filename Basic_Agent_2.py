@@ -24,6 +24,7 @@ class Basic_Agent_2:
         self.dim = dim
         self.map_board = numpy.zeros((self.dim, self.dim), dtype=object)
         self.belief_state = numpy.zeros((self.dim, self.dim), dtype=object)
+        self.confidence_state = numpy.zeros((self.dim, self.dim), dtype=object)
         self.generate_board()
     
     # generate the board for the agent that is going to traverse
@@ -34,6 +35,7 @@ class Basic_Agent_2:
                 # create every i,j instance with the Terrian or belief at t=0 respectively
                 self.map_board[i][j] = Terrians(i, j) # generated map default values
                 self.belief_state[i][j] = 1/(self.dim*self.dim) # generated belief state default values
+                self.confidence_state[i][j] = 0
 
         # generate a random spot for the target to be located
         indicies = list(range(0, self.dim)) # create a list of numbers to choose from
@@ -91,15 +93,11 @@ class Basic_Agent_2:
         # termination variable to track if the target is found or not
         target_found = False
 
-        # variables to keep track of for final result
-        tracking_distance = 0
-        searches = 0
-
         # iterate through every cell over and over until the target is found
         while target_found == False:
 
             # if the target is found immediately exit out of the loop and return the results
-            if (x, y) == self.target_info.target_location:
+            if (x, y) == self.target_info.location:
                 rand = random.randint(0, 1)
                 if rand <= self.map_board[x][y].false_neg:
                     # lets add the cell to the previous failure list
@@ -115,9 +113,7 @@ class Basic_Agent_2:
                             if i != x and j != y:
                                 # if this condition returns true than we found the new highest probability out of all the coordinates
                                 if max_coord[2] < self.confidence_state[i][j]:
-                                    max_coord[0] = i
-                                    max_coord[1] = j
-                                    max_coord[2] = self.confidence_state[i][j]
+                                    max_coord = (i, j, self.confidence_state[i][j])
 
                                 # if the condition returns true there are certain factors we have to take care of
                                 if max_coord[2] == self.confidence_state[i][j]:
@@ -156,9 +152,7 @@ class Basic_Agent_2:
                         if i != x and j != y:
                             # if this condition returns true than we found the new highest probability out of all the coordinates
                             if max_coord[2] < self.confidence_state[i][j]:
-                                max_coord[0] = i
-                                max_coord[1] = j
-                                max_coord[2] = self.confidence_state[i][j]
+                                max_coord = (i, j, self.confidence_state[i][j])
 
                             # if the condition returns true there are certain factors we have to take care of
                             if max_coord[2] == self.confidence_state[i][j]:
