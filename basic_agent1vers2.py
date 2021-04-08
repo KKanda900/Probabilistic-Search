@@ -48,7 +48,7 @@ class Basic_Agent_1:
         indicies = list(range(0, self.dim))
         target_location = (random.choice(indicies), random.choice(indicies))
         terrain_type = self.map_board[target_location[0]
-            ][target_location[1]].terrain_type
+                                      ][target_location[1]].terrain_type
         self.target_info = Target(
             target_location[0], target_location[1], terrain_type)
 
@@ -59,7 +59,6 @@ class Basic_Agent_1:
 
     # update the belief state based on bayesian updating
     def bayesian_update(self, x, y):
-
         '''
         For Bayes updating we want to update the belief state with P(Target in Cell i | Observations at t and Failure in Cell j)
         '''
@@ -71,7 +70,8 @@ class Basic_Agent_1:
         fnr = self.map_board[x][y].false_neg  # FNR of current cell
         # obtain the probability of the target being in the location based on the observation
         curr_cell_belief = self.belief_state[x][y]
-        prob_failure = ((fnr * curr_cell_belief) + (1 - curr_cell_belief)) / 2500
+        prob_failure = ((fnr * curr_cell_belief) +
+                        (1 - curr_cell_belief)) / 2500
         # update the probability of the current cell
         self.belief_state[x][y] = fnr*curr_cell_belief/prob_failure
         print(self.belief_state[x][y])
@@ -85,10 +85,8 @@ class Basic_Agent_1:
             for j in range(self.dim):
                 # if the false negative rates are same we have same terrain cell as the one search failed on in last step
                 if i != x and j != y:
-                    self.belief_state[i][j] = self.belief_state[i][j] / prob_failure
-
-
-
+                    self.belief_state[i][j] = self.belief_state[i][j] / \
+                        prob_failure
 
         '''
         Step 2: Update the remaining probabilities so everything is equal to 1
@@ -99,21 +97,25 @@ class Basic_Agent_1:
             for j in range(self.dim):
                 terrain = self.map_board[i][j].terrain_type
                 if terrain == 'flat':
-                    self.belief_state[i][j] = self.flat["prob"] / self.flat["num"]
+                    self.belief_state[i][j] = self.flat["prob"] / \
+                        self.flat["num"]
                 elif terrain == 'hilly':
-                    self.belief_state[i][j] = self.hilly["prob"] / self.hilly["num"]
+                    self.belief_state[i][j] = self.hilly["prob"] / \
+                        self.hilly["num"]
                 elif terrain == 'forested':
-                    self.belief_state[i][j] = self.forest["prob"] / self.forest["num"]
+                    self.belief_state[i][j] = self.forest["prob"] / \
+                        self.forest["num"]
                 else:
-                    self.belief_state[i][j] = self.caves["prob"] / self.caves["num"]
+                    self.belief_state[i][j] = self.caves["prob"] / \
+                        self.caves["num"]
                     # if the other case isn't true that means we are at every other cell
-
 
         print(self.flat["prob"])
         print(self.hilly["prob"])
         print(self.forest["prob"])
         print(self.caves["prob"])
-        print(self.flat["prob"] + self.hilly["prob"] + self.forest["prob"] + self.caves["prob"])
+        print(self.flat["prob"] + self.hilly["prob"] +
+              self.forest["prob"] + self.caves["prob"])
         print(self.belief_state.sum())
 
     def calculate_neighbors(self, x, y):
@@ -146,7 +148,7 @@ class Basic_Agent_1:
                 ties.append((x_cord, y_cord))
             elif min_distance == distance:
                 ties.append((x_cord, y_cord))
-        if len(ties)==1:
+        if len(ties) == 1:
             print(ties[0])
             return ties[0]
         else:
@@ -168,33 +170,33 @@ class Basic_Agent_1:
                     ties.append((i, j))
         return ties
 
-    def basic_agent(self,x,y):
-        x_cord=x
-        y_cord=y
-        moves_counted=0
-        distance=0
-        while self.target_found==False:
-            if (x_cord,y_cord)==self.target_info.location:
-                fnr=self.map_board[x_cord][y_cord].false_neg
-                rand=random.random()
-                if rand>fnr:
-                    moves_counted+=1
-                    self.target_found=True
+    def basic_agent(self, x, y):
+        x_cord = x
+        y_cord = y
+        moves_counted = 0
+        distance = 0
+        while self.target_found == False:
+            if (x_cord, y_cord) == self.target_info.location:
+                fnr = self.map_board[x_cord][y_cord].false_neg
+                rand = random.random()
+                if rand > fnr:
+                    moves_counted += 1
+                    self.target_found = True
 
                 else:
-                    self.previous_cells.append((x_cord,y_cord))
-                    moves_counted+=1
-                    self.bayesian_update(x_cord,y_cord)
-                    locations=self.calculate_location(self.belief_state)
+                    self.previous_cells.append((x_cord, y_cord))
+                    moves_counted += 1
+                    self.bayesian_update(x_cord, y_cord)
+                    locations = self.calculate_location(self.belief_state)
                     #print(locations)
-                    if len(locations)>1:
-                        location=self.clear_ties(locations,x_cord,y_cord)
+                    if len(locations) > 1:
+                        location = self.clear_ties(locations, x_cord, y_cord)
                         locations.clear()
                         locations.append(location)
-                    coords=locations[0]
-                    distance+=abs(x_cord-coords[0])+abs(y_cord-coords[1])
-                    x_cord=coords[0]
-                    y_cord=coords[1]
+                    coords = locations[0]
+                    distance += abs(x_cord-coords[0])+abs(y_cord-coords[1])
+                    x_cord = coords[0]
+                    y_cord = coords[1]
             else:
                 self.previous_cells.append((x_cord, y_cord))
                 moves_counted += 1
@@ -210,10 +212,11 @@ class Basic_Agent_1:
                 x_cord = coords[0]
                 y_cord = coords[1]
 
-        return moves_counted+distance        
+        return moves_counted+distance
 
-x=random.randint(0,49)
-y=random.randint(0,49)
-info=Basic_Agent_1(50)
-print(info.basic_agent(x,y))
+
+x = random.randint(0, 49)
+y = random.randint(0, 49)
+info = Basic_Agent_1(50)
+print(info.basic_agent(x, y))
 # self.start()
