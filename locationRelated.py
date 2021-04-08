@@ -147,7 +147,7 @@ class Basic_Agent_2:
                     max_coord = (x, y, self.belief_state[x][y])
                     for i in range(len(self.belief_state)):
                         for j in range(len(self.belief_state)):
-                            if i != x and j != y:
+                            if (i,j)!= (x,y):
                                 # if this condition returns true than we found the new highest probability out of all the coordinates
                                 if max_coord[2] < self.confidence_state[i][j]:
                                     max_coord = (i, j, self.confidence_state[i][j])
@@ -155,7 +155,7 @@ class Basic_Agent_2:
                                 # if the condition returns true there are certain factors we have to take care of
                                 if max_coord[2] == self.confidence_state[i][j]:
                                     # returns the coordinates with the lowest manhattan distance
-                                    smallest_coord = self.find_manhattan_distance((x, y), (max_coord[0], max_coord[1]), (i, j))
+                                    smallest_coord = self.clear_ties([(max_coord[0], max_coord[1]), (i, j)],x,y)
                                     # checks if the distance and probability are the same if the condition is met below
                                     if smallest_coord == (max_coord[0], max_coord[1]) and smallest_coord == (i, j):
                                         arr_choices = [0, 1] # store 0 and 1 to pick from randomly to use to distinguish if probability and distance are equal
@@ -194,7 +194,7 @@ class Basic_Agent_2:
                             # if the condition returns true there are certain factors we have to take care of
                             if max_coord[2] == self.confidence_state[i][j]:
                                 # returns the coordinates with the lowest manhattan distance
-                                smallest_coord = self.find_manhattan_distance((x, y), (max_coord[0], max_coord[1]), (i, j))
+                                smallest_coord = self.clear_ties([(max_coord[0], max_coord[1]), (i, j)],x,y)
                                 # checks if the distance and probability are the same if the condition is met below
                                 if smallest_coord == (max_coord[0], max_coord[1]) and smallest_coord == (i, j):
                                     # store 0 and 1 to pick from randomly to use to distinguish if probability and distance are equal
@@ -217,6 +217,8 @@ if __name__ == "__main__":
     agent = Basic_Agent_2(50)
     indicies = list(range(0, agent.dim))  # create a list of numbers to choose from
     agent.start_agent(random.choice(indicies), random.choice(indicies))  
+    
+    
     
     
     
