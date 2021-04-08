@@ -66,7 +66,7 @@ class Basic_Agent_1:
         '''
         Step 1: Update the current cell then update the rest of the cells according to the cell
         '''
-        # obtain the probability of the previous cell failing and the target is in the current cell
+        """ # obtain the probability of the previous cell failing and the target is in the current cell
         fnr = self.map_board[x][y].false_neg  # FNR of current cell
         # obtain the probability of the target being in the location based on the observation
         curr_cell_belief = self.belief_state[x][y]
@@ -74,7 +74,11 @@ class Basic_Agent_1:
                         (1 - curr_cell_belief)) / 2500
         # update the probability of the current cell
         self.belief_state[x][y] = fnr*curr_cell_belief/prob_failure
-        print(self.belief_state[x][y])
+        print(self.belief_state[x][y]) """
+        fnr = self.map_board[x][y].false_neg  # FNR of current cell
+        curr_cell_belief = self.belief_state[x][y]
+        prob_failure = ((fnr * curr_cell_belief) +
+                        (1 - curr_cell_belief)) / 2500
 
         '''
         Step 2: Update the remaining probabilities so everything is equal to 1
@@ -86,6 +90,9 @@ class Basic_Agent_1:
                 # if the false negative rates are same we have same terrain cell as the one search failed on in last step
                 if i != x and j != y:
                     self.belief_state[i][j] = self.belief_state[i][j] / \
+                        prob_failure
+                else:
+                    self.belief_state[i][j] = self.map_board[i][j].false_neg*self.belief_state[i][j] / \
                         prob_failure
 
         '''
