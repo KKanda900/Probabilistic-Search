@@ -13,10 +13,10 @@ class Terrians:
         self.cell_location = (i, j)
         self.terrain_type = random.choice(self.types)
         if self.terrain_type == 'flat':
-            self.false_neg = 0.1
+            self.false_neg = 0.10
         elif self.terrain_type == 'hilly':
-            self.false_neg = 0.3
+            self.false_neg = 0.30
         elif self.terrain_type == 'forested':
-            self.false_neg = 0.7
+            self.false_neg = 0.70
         else:
-            self.false_neg = 0.9
+            self.false_neg = 0.90
