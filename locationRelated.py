@@ -35,7 +35,8 @@ class Basic_Agent_2:
                 # create every i,j instance with the Terrian or belief at t=0 respectively
                 self.map_board[i][j] = Terrians(i, j) # generated map default values
                 self.belief_state[i][j] = 1/(self.dim*self.dim) # generated belief state default values
-                self.confidence_state[i][j] = 0
+                self.confidence_state[i][j] = self.belief_state[i][j] * (1 - self.map_board[i][i].false_neg)
+
 
         # generate a random spot for the target to be located
         indicies = list(range(0, self.dim)) # create a list of numbers to choose from
@@ -136,7 +137,7 @@ class Basic_Agent_2:
             # if the target is found immediately exit out of the loop and return the results
             if (x, y) == self.target_info.location:
                 rand = random.randint(0, 1)
-                if rand <= self.map_board[x][y].false_neg:
+                if rand < self.map_board[x][y].false_neg:
                     # lets add the cell to the previous failure list
                     self.previous_cells.append((x, y))
 
