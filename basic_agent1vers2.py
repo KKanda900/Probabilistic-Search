@@ -102,7 +102,12 @@ class Basic_Agent_1:
                 ties.append((x_cord, y_cord))
             elif min_distance == distance:
                 ties.append((x_cord, y_cord))
-        return ties[0]
+        if len(ties)==1:
+            print(ties[0])
+            return ties[0]
+        else:
+            print("hello")
+            return random.choice(ties)
 
     def calculate_location(self, board):
         location = ()
