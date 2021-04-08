@@ -19,7 +19,6 @@ class Basic_Agent_1:
     forest = {"num": 0, "prob": 0, "false_n": .7}
     caves = {"num": 0, "prob": 0, "false_n": .9}
 
-
     def __init__(self, dim):
         self.dim = dim
         self.map_board = numpy.zeros((self.dim, self.dim), dtype=object)
@@ -126,6 +125,11 @@ class Basic_Agent_1:
                     # if the other case isn't true that means we are at every other cell
 
         print(self.belief_state.sum())
+        print(self.flat["prob"])
+        print(self.hilly["prob"])
+        print(self.forest["prob"])
+        print(self.caves["prob"])
+        print(self.flat["prob"] + self.hilly["prob"] + self.forest["prob"] + self.caves["prob"])
 
     def calculate_neighbors(self, x, y):
         neighbors = []
@@ -208,8 +212,8 @@ class Basic_Agent_1:
 
         return moves_counted+distance        
 
-x=random.randint(0,4)
-y=random.randint(0,4)
-info=Basic_Agent_1(5)
+x=random.randint(0,9)
+y=random.randint(0,9)
+info=Basic_Agent_1(10)
 print(info.basic_agent(x,y))
 # self.start()
