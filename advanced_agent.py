@@ -85,6 +85,62 @@ class AgentClass:
 
         print("sum", self.belief_state.sum())
 
+    # check if what you are checking is within the constraints of the board
+    def check_constraints(self, ind1, ind2):
+        if ind1 >= 0 and ind1 <= self.dim - 1 and ind2 >= 0 and ind2 <= self.dim - 1:
+            return True
+
+        return False
+
+    def next_cell(self, x, y):
+
+        max_total = 0
+
+        for i in range(0, self.dim):
+            for j in range(0, self.dim):
+                if (x, y) != (i, j):
+                    addition = 0
+                    failure_prob = (self.map_board[i][j].false_neg * self.belief_state[i][j]) + (1 - self.map_board[i][j].false_neg)
+
+                    if self.check_constraints(i + 1, j):
+                        belief = self.belief_state[i + 1][j] / failure_prob
+                        addition += belief
+                        addition += belief * (1 - self.map_board[i][j].false_neg)
+                    if self.check_constraints(i - 1, j):
+                        belief = self.belief_state[i - 1][j] / failure_prob
+                        addition += belief
+                        addition += belief * (1 - self.map_board[i][j].false_neg)
+                    if self.check_constraints(i + 1, j + 1):
+                        belief = self.belief_state[i + 1][j + 1] / failure_prob
+                        addition += belief
+                        addition += belief * (1 - self.map_board[i][j].false_neg)
+                    if self.check_constraints(i + 1, j - 1):
+                        belief = self.belief_state[i + 1][j - 1] / failure_prob
+                        addition += belief
+                        addition += belief * (1 - self.map_board[i][j].false_neg)
+                    if self.check_constraints(i - 1, j - 1):
+                        belief = self.belief_state[i - 1][j - 1] / failure_prob
+                        addition += belief
+                        addition += belief * (1 - self.map_board[i][j].false_neg)
+                    if self.check_constraints(i - 1, j + 1):
+                        belief = self.belief_state[i - 1][j + 1] / failure_prob
+                        addition += belief
+                        addition += belief * (1 - self.map_board[i][j].false_neg)
+                    if self.check_constraints(i, j + 1):
+                        belief = self.belief_state[i][j + 1] / failure_prob
+                        addition += belief
+                        addition += belief * (1 - self.map_board[i][j].false_neg)
+                    if self.check_constraints(i, j - 1):
+                        belief = self.belief_state[i][j - 1] / failure_prob
+                        addition += belief
+                        addition += belief * (1 - self.map_board[i][j].false_neg)
+
+                    if addition > max_total:
+                        max_total = addition
+                        
+
+
+
     def advanced_agent(self, x, y):
         x_cord = x
         y_cord = y
