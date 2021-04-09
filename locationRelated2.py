@@ -18,6 +18,7 @@ class Basic_Agent_2:
     previous_cells = [] # stores all the information about the previous cells here in the form (x, y)
     distance_traveled = 0 # stores the distanced traveled from the current cell you start with 
     num_searches = 0 # stores the number of searches made by the agent
+    target_found = False
 
     # initialize information related to the the agent and the map itself
     def __init__(self, dim):
@@ -35,13 +36,15 @@ class Basic_Agent_2:
                 # create every i,j instance with the Terrian or belief at t=0 respectively
                 self.map_board[i][j] = Terrians(i, j) # generated map default values
                 self.belief_state[i][j] = 1/(self.dim*self.dim) # generated belief state default values
-                self.confidence_state[i][j] = self.belief_state[i][j] * (1 - self.map_board[i][i].false_neg)
+                #print(self.map_board[i][j].false_neg)
+                #self.confidence_state[i][j] = self.belief_state[i][j] * (1 - self.map_board[i][i].false_neg)
 
 
         # generate a random spot for the target to be located
         indicies = list(range(0, self.dim)) # create a list of numbers to choose from
         target_location = (random.choice(indicies), random.choice(indicies)) # get a random target location
-        terrian_type = self.map_board[target_location[0]][target_location[1]].terrian_type # the terrain of the target will be whatever map_board[x][y] is
+        print(self.map_board[target_location[0]][target_location[1]].__dict__)
+        terrian_type = self.map_board[target_location[0]][target_location[1]].terrain_type # the terrain of the target will be whatever map_board[x][y] is
         self.target_info = Target(target_location[0], target_location[1], terrian_type) # store the information in the target_info variable
     
     # update the belief state based on bayesian updating (for basic agent 2)
@@ -118,57 +121,54 @@ class Basic_Agent_2:
 
     # start basic agent 2 here
     def start_agent(self, x, y):
+        x_cord = x
+        y_cord=y
+        moves_counted=0
+        distance=0
+        while self.target_found==False:
+            if (x_cord,y_cord)==self.target_info.location:
+                fnr=self.map_board[x_cord][y_cord].false_neg
+                rand=random.random()
+                if rand>fnr:
+                    moves_counted+=1
+                    self.target_found=True
 
-        # termination variable to track if the target is found or not
-        target_found = False
-
-        # iterate through every cell over and over until the target is found
-        while target_found is False:
-
-            # if the target is found immediately exit out of the loop and return the results
-            if (x, y) == self.target_info.location:
-                rand = random.randint(0, 1)
-                if rand < self.map_board[x][y].false_neg:
-                    # lets add the cell to the previous failure list
-                    self.previous_cells.append((x, y))
-
-                    # update the belief state based on equation 5 from the pdf write-up
-                    self.bayesian_update(x, y)
-
-                    # now iterate through all the cells that when i != x and j != y to find the new highest probabilities
-                    locations = self.calculate_location(self.confidence_state)
+                else:
+                    self.previous_cells.append((x_cord,y_cord))
+                    moves_counted+=1
+                    self.bayesian_update(x_cord,y_cord)
+                    locations=self.calculate_location(self.belief_state)
+                    #print(locations)
                     if len(locations)>1:
-                        location=self.clear_ties(locations,x,y) 
+                        location=self.clear_ties(locations,x_cord,y_cord)
                         locations.clear()
                         locations.append(location)
                     coords=locations[0]
-                    x=coords[0]
-                    y=coords[1]   
-                else:
-                    # once we reach here we should exit out the loop and return the results
-                    target_found = True
+                    distance+=abs(x_cord-coords[0])+abs(y_cord-coords[1])
+                    x_cord=coords[0]
+                    y_cord=coords[1]
             else:
-                # lets add the cell to the previous failure list
-                self.previous_cells.append((x, y))
-
-                # update the belief state based on equation 5 from the pdf write-up
-                self.bayesian_update(x, y)
-
-                # now iterate through all the cells that when i != x and j != y to find the new highest probabilities
-                locations=self.calculate_location(self.confidence_state)
-                if len(locations)>1:
-                    location=self.clear_ties(locations,x,y) 
+                self.previous_cells.append((x_cord, y_cord))
+                moves_counted += 1
+                self.bayesian_update(x_cord, y_cord)
+                locations = self.calculate_location(self.belief_state)
+                # print(locations)
+                if len(locations) > 1:
+                    location = self.clear_ties(locations, x_cord, y_cord)
                     locations.clear()
                     locations.append(location)
-                coords=locations[0]
-                x=coords[0]
-                y=coords[1]
+                coords = locations[0]
+                distance += abs(x_cord - coords[0]) + abs(y_cord - coords[1])
+                x_cord = coords[0]
+                y_cord = coords[1]
+
+        return moves_counted+distance
 
 # start the basic agent 2 process here
 if __name__ == "__main__":
     agent = Basic_Agent_2(50)
     indicies = list(range(0, agent.dim))  # create a list of numbers to choose from
-    agent.start_agent(random.choice(indicies), random.choice(indicies))  
+    print(agent.start_agent(random.choice(indicies), random.choice(indicies)))  
     
     
     
