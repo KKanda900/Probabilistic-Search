@@ -1,4 +1,4 @@
-import numpy, sys, random, math
+import numpy, sys, random
 from Terrain import Terrians
 from Target import Target
 
@@ -165,10 +165,11 @@ class Basic_Agent_2:
         return moves_counted+distance
 
 # start the basic agent 2 process here
-if __name__ == "__main__":
+def run_agent_2():
     agent = Basic_Agent_2(50)
-    indicies = list(range(0, agent.dim))  # create a list of numbers to choose from
-    print(agent.start_agent(random.choice(indicies), random.choice(indicies)))  
+    # create a list of numbers to choose from
+    indicies = list(range(0, agent.dim))
+    return agent.start_agent(random.choice(indicies), random.choice(indicies))
     
     
     

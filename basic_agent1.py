@@ -168,8 +168,10 @@ class Basic_Agent_1:
 
         return moves_counted+distance
 
-x=random.randint(0,49)
-y=random.randint(0,49)
-info=Basic_Agent_1(50)
-print(info.basic_agent(x,y))
+def run_agent_1():
+    x = random.randint(0, 49)
+    y = random.randint(0, 49)
+    info = Basic_Agent_1(50)
+    return info.basic_agent(x, y)
+
 # self.start()
