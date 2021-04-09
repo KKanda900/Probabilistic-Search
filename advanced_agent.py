@@ -84,3 +84,13 @@ class AgentClass:
                     self.confidence_state[i][j] = self.belief_state[i][j] * (1 - self.map_board[i][j].false_neg)
 
         print("sum", self.belief_state.sum())
+
+    def advanced_agent(self, x, y):
+        x_cord = x
+        y_cord = y
+        moves_counted = 0
+        distance = 0
+
+        while self.target_found is False:
+
+            moves_counted += 1
