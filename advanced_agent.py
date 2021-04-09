@@ -95,11 +95,12 @@ class AgentClass:
     def next_cell(self, x, y):
 
         max_total = 0
+        max_point = (0, 0)
 
         for i in range(0, self.dim):
             for j in range(0, self.dim):
                 if (x, y) != (i, j):
-                    addition = 0
+                    addition = 0  # represents the total of confidence and beliefs of it's neighbors
                     failure_prob = (self.map_board[i][j].false_neg * self.belief_state[i][j]) + (1 - self.map_board[i][j].false_neg)
 
                     if self.check_constraints(i + 1, j):
@@ -137,7 +138,15 @@ class AgentClass:
 
                     if addition > max_total:
                         max_total = addition
-                        
+                        max_point = (i, j)
+                    elif addition == max_total:
+                        if (abs(x - i) + abs(y - j)) < (abs(x - max_point[0]) + abs(y - max_point[0])):
+                            max_total = addition
+                            max_point = (i, j)
+
+        return max_point
+
+
 
 
 
