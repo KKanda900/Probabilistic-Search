@@ -138,7 +138,7 @@ class Basic_Agent_2:
                 else:
                     self.previous_cells.append((x_cord,y_cord))
                     self.bayesian_update(x_cord,y_cord)
-                    locations=self.calculate_location(self.belief_state)
+                    locations=self.calculate_location(self.confidence_state)
 
                     if len(locations)>1:
                         location=self.clear_ties(locations,x_cord,y_cord)
@@ -152,7 +152,7 @@ class Basic_Agent_2:
             else:
                 self.previous_cells.append((x_cord, y_cord))
                 self.bayesian_update(x_cord, y_cord)
-                locations = self.calculate_location(self.belief_state)
+                locations = self.calculate_location(self.confidence_state)
                 # print(locations)
                 if len(locations) > 1:
                     location = self.clear_ties(locations, x_cord, y_cord)
