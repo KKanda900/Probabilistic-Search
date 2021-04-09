@@ -146,51 +146,46 @@ class AgentClass:
 
         return max_point
 
-
-
-        def test_moves(self,start_x,start_y,end_x,end_y):
-            x=start_x
-            y=start_y+1
-            list1=[]
-            list2=[]
-            count1=0
-            count2=0
-            list3=[]
-            while y<=end_y:
-                if self.belief_state[x][y]>0.85*self.belief_state[end_x][end_y]:
-                    count1+=1
-                list1.append((x,y))
-                y+=1
-            y-=1
-            while x<end_x:
-                if self.belief_state[x][y]>0.85*self.belief_state[end_x][end_y]:
-                    count1+=1
-                list1.append((x,y))
-                x+=1
-            x=start_x+1
-            y=start_y
-            while x<=end_x:
-                if self.belief_state[x][y]>0.85*self.belief_state[end_x][end_y]:
-                    count2+=1
-                list2.append((x,y))
-                x+=1
-            x-=1
-            while y<end_y:
-                if self.belief_state[x][y]>0.85*self.belief_state[end_x][end_y]:
-                    count2+=1
-                list1.append((x,y))
-                y+=1
-            list3.append(list1)
-            list3.append(list2)
-            if count2<count1:
-                return count1
-            elif count1<count2:
-                return count2
-            elif count1==count2:
-                return random.choice(list3)
-                
-                
-
+    def test_moves(self, start_x, start_y, end_x, end_y):
+        x = start_x
+        y = start_y + 1
+        list1 = []
+        list2 = []
+        count1 = 0
+        count2 = 0
+        list3 = []
+        while y <= end_y:
+            if self.belief_state[x][y] > 0.85*self.belief_state[end_x][end_y]:
+                count1 += 1
+            list1.append((x, y))
+            y += 1
+        y -= 1
+        while x < end_x:
+            if self.belief_state[x][y] > 0.85*self.belief_state[end_x][end_y]:
+                count1 += 1
+            list1.append((x, y))
+            x += 1
+        x = start_x+1
+        y = start_y
+        while x <= end_x:
+            if self.belief_state[x][y] > 0.85*self.belief_state[end_x][end_y]:
+                count2 += 1
+            list2.append((x, y))
+            x += 1
+        x -= 1
+        while y < end_y:
+            if self.belief_state[x][y] > 0.85*self.belief_state[end_x][end_y]:
+                count2 += 1
+            list1.append((x, y))
+            y += 1
+        list3.append(list1)
+        list3.append(list2)
+        if count2 < count1:
+            return count1
+        elif count1 < count2:
+            return count2
+        elif count1 == count2:
+            return random.choice(list3)
 
     def advanced_agent(self, x, y):
         x_cord = x
@@ -201,3 +196,79 @@ class AgentClass:
         while self.target_found is False:
 
             moves_counted += 1
+            if (x_cord, y_cord) == self.target_info.location:
+                fnr = self.map_board[x_cord][y_cord].false_neg
+                rand = random.random()
+                if rand > fnr:
+                    self.target_found = True
+
+                rand = random.random()
+                if self.map_board[x_cord][y_cord].terrain_type == "flat" and rand > fnr:  # if the cell is a flat terrain we check twice
+                    moves_counted += 1
+                    self.target_found = True
+
+                else:
+                    self.bayesian_update(x_cord, y_cord)
+                    next_cell = self.next_cell(x_cord, y_cord)
+                    path_cells = self.test_moves(x_cord, y_cord, next_cell[0], next_cell[1])
+
+                    if len(path_cells) > 1:  # if there are cells in path that have beliefs of higher than 85% of the next cell we are going to search, we search the cell
+
+                        for z in range(0, len(path_cells)):
+
+                            check_cell = path_cells.pop()
+                            moves_counted += 1
+                            fnr = self.map_board[check_cell[0]][check_cell[1]].false_neg
+                            rand = random.random()
+                            if check_cell == self.target_info.location and rand > fnr:
+                                self.target_found = True
+                                break
+                            if self.map_board[check_cell[0]][check_cell[1]].terrain_type == "flat":  # if the cell is a flat terrain we check twice
+                                rand = random.random()
+                                if check_cell == self.target_info.location and rand > fnr:
+                                    moves_counted += 1
+                                    self.target_found = True
+                                    break
+
+                    distance += abs(x_cord - next_cell[0]) + abs(y_cord - next_cell[1])
+                    x_cord = next_cell[0]
+                    y_cord = next_cell[1]
+
+            else:
+                self.bayesian_update(x_cord, y_cord)
+                next_cell = self.next_cell(x_cord, y_cord)
+                path_cells = self.test_moves(x_cord, y_cord, next_cell[0], next_cell[1])
+
+                if len(path_cells) > 1:  # if there are cells in path that have beliefs of higher than 85% of the next cell we are going to search, we search the cell
+
+                    for z in range(0, len(path_cells)):
+
+                        check_cell = path_cells.pop()
+                        moves_counted += 1
+                        fnr = self.map_board[check_cell[0]][check_cell[1]].false_neg
+                        rand = random.random()
+                        if check_cell == self.target_info.location and rand > fnr:
+                            self.target_found = True
+                            break
+                        if self.map_board[check_cell[0]][check_cell[1]].terrain_type == "flat":  # if the cell is a flat terrain we check twice
+                            rand = random.random()
+                            if check_cell == self.target_info.location and rand > fnr:
+                                moves_counted += 1
+                                self.target_found = True
+                                break
+
+                distance += abs(x_cord - next_cell[0]) + abs(y_cord - next_cell[1])
+                x_cord = next_cell[0]
+                y_cord = next_cell[1]
+
+        return moves_counted + distance
+
+
+def start_agent():
+    agent = AgentClass(50)
+    # create a list of numbers to choose from
+    indicies = list(range(0, agent.dim))
+    print(agent.advanced_agent(random.choice(indicies), random.choice(indicies)))
+
+
+start_agent()
