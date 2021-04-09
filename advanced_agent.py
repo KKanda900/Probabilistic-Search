@@ -177,9 +177,9 @@ class AgentClass:
         list3.append(list1)
         list3.append(list2)
         if count2 < count1:
-            return count1
+            return list1
         elif count1 < count2:
-            return count2
+            return list2
         elif count1 == count2:
             return random.choice(list3)
 
