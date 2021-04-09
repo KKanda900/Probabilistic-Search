@@ -1,0 +1,14 @@
+Basic Agent 2 Score for Target in forested: 4222.2
+
+Basic Agent 2 Score for Target in hilly: 5072.7
+
+Basic Agent 2 Score for Target in hilly: 245.2
+
+Basic Agent 2 Score for Target in forested: 716.6
+
+Basic Agent 2 Score for Target in hilly: 335.4
+
+Basic Agent 2 Score for Target in caves: 2216.8
+
+Basic Agent 2 Score for Target in flat: 184.4
+

@@ -35,10 +35,8 @@ class Basic_Agent_1:
         # generate a random spot for the target to be located
         indicies = list(range(0, self.dim))
         target_location = (random.choice(indicies), random.choice(indicies))
-        terrain_type = self.map_board[target_location[0]
-            ][target_location[1]].terrain_type
-        self.target_info = Target(
-            target_location[0], target_location[1], terrain_type)
+        terrain_type = self.map_board[target_location[0]][target_location[1]].terrain_type
+        self.target_info = Target(target_location[0], target_location[1], terrain_type)
 
 
     # update the belief state based on bayesian updating
@@ -168,8 +166,9 @@ class Basic_Agent_1:
 
         return moves_counted+distance
 
-x=random.randint(0,49)
-y=random.randint(0,49)
-info=Basic_Agent_1(50)
-print(info.basic_agent(x,y))
-# self.start()
+def start_agent():
+    x = random.randint(0, 49)
+    y = random.randint(0, 49)
+    info = Basic_Agent_1(50)
+    return info.basic_agent(x, y)
+

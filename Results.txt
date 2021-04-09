@@ -1,19 +1,20 @@
-Test 1 Results: Basic Agent 1 Score - 10295 and Basic Agent 2 Score 41902
+Test 1 Results: Basic Agent 1 Score - 1700 and Basic Agent 2 Score 84662
 
-Test 2 Results: Basic Agent 1 Score - 3213 and Basic Agent 2 Score 2281
+Test 2 Results: Basic Agent 1 Score - 1768 and Basic Agent 2 Score 1453
 
-Test 3 Results: Basic Agent 1 Score - 47838 and Basic Agent 2 Score 53552
+Test 3 Results: Basic Agent 1 Score - 4586 and Basic Agent 2 Score 10192
 
-Test 4 Results: Basic Agent 1 Score - 86290 and Basic Agent 2 Score 2804
+Test 4 Results: Basic Agent 1 Score - 2534 and Basic Agent 2 Score 12872
 
-Test 5 Results: Basic Agent 1 Score - 2400 and Basic Agent 2 Score 3135
+Test 5 Results: Basic Agent 1 Score - 4234 and Basic Agent 2 Score 26353
 
-Test 6 Results: Basic Agent 1 Score - 887 and Basic Agent 2 Score 73721
+Test 6 Results: Basic Agent 1 Score - 120239 and Basic Agent 2 Score 21675
 
-Test 7 Results: Basic Agent 1 Score - 232 and Basic Agent 2 Score 77134
+Test 7 Results: Basic Agent 1 Score - 441387 and Basic Agent 2 Score 29347
 
-Test 8 Results: Basic Agent 1 Score - 42974 and Basic Agent 2 Score 429
+Test 8 Results: Basic Agent 1 Score - 71604 and Basic Agent 2 Score 6300
 
-Test 9 Results: Basic Agent 1 Score - 92415 and Basic Agent 2 Score 5087
+Test 9 Results: Basic Agent 1 Score - 1976 and Basic Agent 2 Score 617
 
-Test 10 Results: Basic Agent 1 Score - 187026 and Basic Agent 2 Score 5093
+Test 10 Results: Basic Agent 1 Score - 43354 and Basic Agent 2 Score 35806
+

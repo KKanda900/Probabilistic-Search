@@ -1,12 +1,39 @@
-import locationRelated2
-import basic_agent1
+import basic_agent_1
+import basic_agent_2
+import random
 
 if __name__ == "__main__":
-    num_tests = 10
-    f = open("Results.txt", "a")
-    while num_tests != 0:
-        results_ba2 = locationRelated2.run_agent_2()
-        results_ba1 = basic_agent1.run_agent_1()
-        f.write("Test {} Results: Basic Agent 1 Score - {} and Basic Agent 2 Score {}\n\n".format(num_tests, results_ba1, results_ba2)) 
-        num_tests -= 1
-    f.close()
+    """ f = open("Results2.txt", "a")
+    
+    ba2_map = basic_agent_2.Basic_Agent_2(50)
+
+    num = 1
+    ba2_results = []
+    target_terrain = ba2_map.target_info.terrain_location
+    while num != 11:
+        x = random.randint(0, 49)
+        y = random.randint(0, 49)
+        score = ba2_map.start_agent(x, y)
+        ba2_results.append(score)
+        num+=1
+
+    f.write("Basic Agent 2 Score for Target in {}: {}\n\n".format(target_terrain, (sum(ba2_results)/len(ba2_results))))
+
+    f.close() """
+
+    f = open("Results1.txt", "a")
+
+    ba2_map = basic_agent_2.Basic_Agent_2(50)
+
+    num = 1
+    ba2_results = []
+    target_terrain = ba2_map.target_info.terrain_location
+    while num != 11:
+        x = random.randint(0, 49)
+        y = random.randint(0, 49)
+        score = ba2_map.start_agent(x, y)
+        ba2_results.append(score)
+        num+=1
+
+    f.write("Basic Agent 2 Score for Target in {}: {}\n\n".format(
+        target_terrain, (sum(ba2_results)/len(ba2_results))))

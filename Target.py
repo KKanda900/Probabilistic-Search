@@ -1,7 +1,7 @@
 class Target:
     location = ()
-    terrian_location = None
+    terrain_location = None
 
-    def __init__(self, i, j, terrian_location):
+    def __init__(self, i, j, terrain_location):
         self.location = (i, j)
-        self.terrian_location = terrian_location
+        self.terrain_location = terrain_location

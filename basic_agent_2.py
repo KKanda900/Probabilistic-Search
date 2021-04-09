@@ -43,7 +43,6 @@ class Basic_Agent_2:
         # generate a random spot for the target to be located
         indicies = list(range(0, self.dim)) # create a list of numbers to choose from
         target_location = (random.choice(indicies), random.choice(indicies)) # get a random target location
-        print(self.map_board[target_location[0]][target_location[1]].__dict__)
         terrian_type = self.map_board[target_location[0]][target_location[1]].terrain_type # the terrain of the target will be whatever map_board[x][y] is
         self.target_info = Target(target_location[0], target_location[1], terrian_type) # store the information in the target_info variable
     
@@ -166,10 +165,12 @@ class Basic_Agent_2:
         return moves_counted+distance
 
 # start the basic agent 2 process here
-if __name__ == "__main__":
+def start_agent():
     agent = Basic_Agent_2(50)
-    indicies = list(range(0, agent.dim))  # create a list of numbers to choose from
-    print(agent.start_agent(random.choice(indicies), random.choice(indicies)))  
+    # create a list of numbers to choose from
+    indicies = list(range(0, agent.dim))
+    return agent.start_agent(random.choice(indicies), random.choice(indicies))
+
     
     
     
