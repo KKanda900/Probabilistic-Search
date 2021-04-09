@@ -148,6 +148,48 @@ class AgentClass:
 
 
 
+        def test_moves(self,start_x,start_y,end_x,end_y):
+            x=start_x
+            y=start_y+1
+            list1=[]
+            list2=[]
+            count1=0
+            count2=0
+            list3=[]
+            while y<=end_y:
+                if self.belief_state[x][y]>0.85*self.belief_state[end_x][end_y]:
+                    count1+=1
+                list1.append((x,y))
+                y+=1
+            y-=1
+            while x<end_x:
+                if self.belief_state[x][y]>0.85*self.belief_state[end_x][end_y]:
+                    count1+=1
+                list1.append((x,y))
+                x+=1
+            x=start_x+1
+            y=start_y
+            while x<=end_x:
+                if self.belief_state[x][y]>0.85*self.belief_state[end_x][end_y]:
+                    count2+=1
+                list2.append((x,y))
+                x+=1
+            x-=1
+            while y<end_y:
+                if self.belief_state[x][y]>0.85*self.belief_state[end_x][end_y]:
+                    count2+=1
+                list1.append((x,y))
+                y+=1
+            list3.append(list1)
+            list3.append(list2)
+            if count2<count1:
+                return count1
+            elif count1<count2:
+                return count2
+            elif count1==count2:
+                return random.choice(list3)
+                
+                
 
 
     def advanced_agent(self, x, y):
