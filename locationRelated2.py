@@ -1,4 +1,4 @@
-import numpy, sys, random, math
+import numpy, random
 from Terrain import Terrians
 from Target import Target
 
@@ -7,10 +7,10 @@ class Basic_Agent_2:
     
     # information to store about the generated map
     dim = 0 # default size 0 to start with 
-    map_board = numpy.zeros((dim, dim), dtype=object) # in the start create the map_board with the default dimension of 0
+    map_board = numpy.zeros((dim, dim), dtype=object)  # in the start create the map_board with the default dimension of 0
     
     # target info will hold all the information related to the target
-    target_info = None # set to None as default because the map wasn't generated yet
+    target_info = None  # set to None as default because the map wasn't generated yet
 
     # information to store for the basic agent to use
     belief_state = numpy.zeros((dim, dim), dtype=object) # tracks the belief of target being in cell_i given the observations
@@ -77,7 +77,7 @@ class Basic_Agent_2:
             for j in range(self.dim):
                 if (i, j) != (x, y):
                     self.belief_state[i][j] /= prob_failure
-                    self.confidence_state[i][j] = self.belief_state[i][j] * (1 - self.map_board[i][i].false_neg)
+                    self.confidence_state[i][j] = self.belief_state[i][j] * (1 - self.map_board[i][j].false_neg)
 
         print("sum", self.belief_state.sum())
 
@@ -126,19 +126,20 @@ class Basic_Agent_2:
         moves_counted=0
         distance=0
         while self.target_found==False:
+
+            moves_counted += 1
+
             if (x_cord,y_cord)==self.target_info.location:
                 fnr=self.map_board[x_cord][y_cord].false_neg
                 rand=random.random()
                 if rand>fnr:
-                    moves_counted+=1
                     self.target_found=True
 
                 else:
                     self.previous_cells.append((x_cord,y_cord))
-                    moves_counted+=1
                     self.bayesian_update(x_cord,y_cord)
                     locations=self.calculate_location(self.belief_state)
-                    #print(locations)
+
                     if len(locations)>1:
                         location=self.clear_ties(locations,x_cord,y_cord)
                         locations.clear()
@@ -147,9 +148,9 @@ class Basic_Agent_2:
                     distance+=abs(x_cord-coords[0])+abs(y_cord-coords[1])
                     x_cord=coords[0]
                     y_cord=coords[1]
+
             else:
                 self.previous_cells.append((x_cord, y_cord))
-                moves_counted += 1
                 self.bayesian_update(x_cord, y_cord)
                 locations = self.calculate_location(self.belief_state)
                 # print(locations)
