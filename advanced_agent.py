@@ -39,8 +39,7 @@ class AgentClass:
                 # create every i,j instance with the Terrain or belief at t=0 respectively
                 self.map_board[i][j] = Terrians(i, j)  # generated map default values
                 self.belief_state[i][j] = 1 / (self.dim * self.dim)  # generated belief state default values
-                # print(self.map_board[i][j].false_neg)
-                # self.confidence_state[i][j] = self.belief_state[i][j] * (1 - self.map_board[i][i].false_neg)
+
 
         # generate a random spot for the target to be located
         indices = list(range(0, self.dim))  # create a list of numbers to choose from
@@ -69,8 +68,6 @@ class AgentClass:
         # update the probability of the current cell
         self.belief_state[x][y] = (fnr * curr_cell_belief) / prob_failure
         self.confidence_state[x][y] = curr_cell_belief * (1 - fnr)
-        print("point:", x, y)
-        print("belief[x][y]:", self.belief_state[x][y])
 
         '''
         Step 2: Update the remaining probabilities so everything is equal to 1
@@ -83,7 +80,6 @@ class AgentClass:
                     self.belief_state[i][j] /= prob_failure
                     self.confidence_state[i][j] = self.belief_state[i][j] * (1 - self.map_board[i][j].false_neg)
 
-        print("sum", self.belief_state.sum())
 
     # check if what you are checking is within the constraints of the board
     def check_constraints(self, ind1, ind2):
