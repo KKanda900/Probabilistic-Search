@@ -71,16 +71,14 @@ class AgentClass:
         self.confidence_state[x][y] = curr_cell_belief * (1 - fnr)
 
         '''
-        Step 2: Update the remaining probabilities so everything is equal to 1
+        Step 2: Update the remaining probabilities so everything is equal to 1 and update the confidence levels
         '''
-        # go to each cell and make sure the total probability equals 1
 
         for i in range(self.dim):
             for j in range(self.dim):
                 if (i, j) != (x, y):
                     self.belief_state[i][j] /= prob_failure
                     self.confidence_state[i][j] = self.belief_state[i][j] * (1 - self.map_board[i][j].false_neg)
-
 
     # check if what you are checking is within the constraints of the board
     def check_constraints(self, ind1, ind2):
@@ -92,7 +90,7 @@ class AgentClass:
     def next_cell(self, x, y):
 
         max_total = 0
-        max_point = (0, 0)
+        max_point = (0, 0)  # the cell that has the best neighboring cells we can search next
 
         alpha = (self.dim * self.dim) / (self.searches + (2 * self.dim * self.dim))  # as we do more searches the importance of confidence decreases
 
@@ -135,17 +133,17 @@ class AgentClass:
                         addition += belief
                         addition += belief * (1 - self.map_board[i][j].false_neg) * alpha
 
-                    if addition > max_total:
+                    if addition > max_total:  # if the current addition is greater then we replace the max_point
                         max_total = addition
                         max_point = (i, j)
-                    elif addition == max_total:
+                    elif addition == max_total:  # if the additions are equal we choose the one with smaller distance
                         if (abs(x - i) + abs(y - j)) < (abs(x - max_point[0]) + abs(y - max_point[0])):
                             max_total = addition
                             max_point = (i, j)
 
         return max_point
 
-    def neighbors_list(self, x, y):
+    def neighbors_list(self, x, y):  # returns a list of neighbors of the current cell that are valid
 
         neighbors = []
 
@@ -168,16 +166,19 @@ class AgentClass:
 
         return neighbors
 
-    def test_moves(self, start_x, start_y, end_x, end_y):
+    def test_moves(self, start_x, start_y, end_x, end_y):  # looks for cells that we can search on the way from current to next cell
+
+        # we only use the 2 manhattan paths to find the cells that we can search
+
         x = start_x
         y = start_y + 1
-        list1 = []
-        list2 = []
+        list1 = []  # list of cells that we should search in path 1
+        list2 = []  # list of cells that we should search in path 2
         count1 = 0
         count2 = 0
         list3 = []
         while y <= end_y:
-            if self.belief_state[x][y] > 0.85*self.belief_state[end_x][end_y]:
+            if self.belief_state[x][y] > 0.85*self.belief_state[end_x][end_y]:  # only add the cell to list if it's bigger than .85 * belief of end cell
                 count1 += 1
             list1.append((x, y))
             y += 1
@@ -202,11 +203,11 @@ class AgentClass:
             y += 1
         list3.append(list1)
         list3.append(list2)
-        if count2 < count1:
+        if count2 < count1:  # we return the list with more cells in the list
             return list1
         elif count1 < count2:
             return list2
-        elif count1 == count2:
+        elif count1 == count2:  # if there are equal cells in the list we choose randomly
             return random.choice(list3)
 
     def advanced_agent(self, x, y):
@@ -215,24 +216,24 @@ class AgentClass:
         moves_counted = 0
         distance = 0
 
-        while self.target_found is False:
+        while self.target_found is False:  # we keep going until the target is found
 
             self.searches = moves_counted
 
             moves_counted += 1
 
-            neighbors = self.neighbors_list(x_cord, y_cord)
+            neighbors = self.neighbors_list(x_cord, y_cord)  # list of valid neighbors of the current cell
 
-            for z in range(0, len(neighbors)):
+            for z in range(0, len(neighbors)):  # we search all the neighbors
 
                 check_cell = neighbors.pop()
                 moves_counted += 2  # moving + searching
                 fnr = self.map_board[check_cell[0]][check_cell[1]].false_neg
-                rand = random.random()
-                self.bayesian_update(check_cell[0], check_cell[1])
+                rand = random.random()  # random value from 0 to 1
+                self.bayesian_update(check_cell[0], check_cell[1])  # we update the probabilities
                 if check_cell == self.target_info.location and rand > fnr:
                     self.target_found = True
-                    break
+                    break  # if the target is found we break out of the loop
                 if self.map_board[check_cell[0]][check_cell[1]].terrain_type == "flat":  # if the cell is a flat terrain we check twice
                     rand = random.random()
                     self.bayesian_update(check_cell[0], check_cell[1])
@@ -243,7 +244,7 @@ class AgentClass:
 
             moves_counted += 1  # to return to current cell
 
-            if (x_cord, y_cord) == self.target_info.location:
+            if (x_cord, y_cord) == self.target_info.location:  # if the current cell is the target cell
                 fnr = self.map_board[x_cord][y_cord].false_neg
                 rand = random.random()
                 if rand > fnr:
@@ -255,14 +256,13 @@ class AgentClass:
                     self.target_found = True
 
                 else:
-                    self.bayesian_update(x_cord, y_cord)
-                    next_cell = self.next_cell(x_cord, y_cord)
-                    path_cells = self.test_moves(x_cord, y_cord, next_cell[0], next_cell[1])
-                    print(next_cell)
+                    self.bayesian_update(x_cord, y_cord)  # update the probabilities as the search has failed
+                    next_cell = self.next_cell(x_cord, y_cord)  # find the best next cell to search
+                    path_cells = self.test_moves(x_cord, y_cord, next_cell[0], next_cell[1])  # list of cells that we can search on the way from current to next cell
 
                     if len(path_cells) > 1:  # if there are cells in path that have beliefs of higher than 85% of the next cell we are going to search, we search the cell
 
-                        for z in range(0, len(path_cells)):
+                        for z in range(0, len(path_cells)):  # search all the path_cells
 
                             check_cell = path_cells.pop()
                             moves_counted += 1
@@ -280,15 +280,14 @@ class AgentClass:
                                     self.target_found = True
                                     break
 
-                    distance += abs(x_cord - next_cell[0]) + abs(y_cord - next_cell[1])
-                    x_cord = next_cell[0]
-                    y_cord = next_cell[1]
+                    distance += abs(x_cord - next_cell[0]) + abs(y_cord - next_cell[1])  # add the distance travelled from current to next cell
+                    x_cord = next_cell[0]  # replace to x coordinate of next cell to search
+                    y_cord = next_cell[1]  # replace to y coordinate of next cell to search
 
             else:
                 self.bayesian_update(x_cord, y_cord)
                 next_cell = self.next_cell(x_cord, y_cord)
                 path_cells = self.test_moves(x_cord, y_cord, next_cell[0], next_cell[1])
-                print(next_cell)
 
                 if len(path_cells) > 1:  # if there are cells in path that have beliefs of higher than 85% of the next cell we are going to search, we search the cell
 
@@ -308,9 +307,9 @@ class AgentClass:
                                 self.target_found = True
                                 break
 
-                distance += abs(x_cord - next_cell[0]) + abs(y_cord - next_cell[1])
-                x_cord = next_cell[0]
-                y_cord = next_cell[1]
+                distance += abs(x_cord - next_cell[0]) + abs(y_cord - next_cell[1])  # add the distance travelled from current to next cell
+                x_cord = next_cell[0]  # replace to x coordinate of next cell to search
+                y_cord = next_cell[1]  # replace to y coordinate of next cell to search
 
         return moves_counted + distance
 
