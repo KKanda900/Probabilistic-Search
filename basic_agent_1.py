@@ -72,18 +72,6 @@ class Basic_Agent_1:
         print("sum", self.belief_state.sum())
 
     
-    def calculate_neighbors(self, x, y):
-        neighbors = []
-        if x+1 < self.dim and y < self.dim:
-            neighbors.append((x+1, y))
-        if x < self.dim and y+1 < self.dim:
-            neighbors.append((x, y+1))
-        if x-1 < self.dim and y < self.dim:
-            neighbors.append((x-1, y))
-        if x < self.dim and y-1 < self.dim:
-            neighbors.append((x, y-1))
-        return neighbors
-    
     #breaks any ties that exist between cells with equal probabilities or the case where cells have equal probabilities and same shortest distance and returns one cell
     def clear_ties(self, board, x, y):
         min_distance = 0.0 #initializes minimum distance
