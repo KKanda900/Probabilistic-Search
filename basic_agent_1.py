@@ -71,7 +71,7 @@ class Basic_Agent_1:
 
         print("sum", self.belief_state.sum())
 
-
+    
     def calculate_neighbors(self, x, y):
         neighbors = []
         if x+1 < self.dim and y < self.dim:
@@ -83,72 +83,80 @@ class Basic_Agent_1:
         if x < self.dim and y-1 < self.dim:
             neighbors.append((x, y-1))
         return neighbors
-
+    
+    #breaks any ties that exist between cells with equal probabilities or the case where cells have equal probabilities and same shortest distance and returns one cell
     def clear_ties(self, board, x, y):
-        min_distance = 0.0
-        ties = []
+        min_distance = 0.0 #initializes minimum distance
+        ties = [] #represents the list of cells to return
         j = 0
+        #iterates through board
         for i in board:
             x_cord = i[0]
             y_cord = i[1]
-            distance = abs(x_cord-x) + abs(y_cord-y)
+            distance = abs(x_cord-x) + abs(y_cord-y) #manhatten distance between current element of list and current cell the agent is in
             if j == 0:
-                min_distance = distance
-                ties.append((x_cord, y_cord))
+                min_distance = distance #sets minimum distance to the first cell in the list
+                ties.append((x_cord, y_cord)) #adds current element in list to list
                 j = 1
             elif distance < min_distance:
-                min_distance = distance
-                ties.clear()
-                ties.append((x_cord, y_cord))
+                min_distance = distance #sets a new minimum distance
+                ties.clear() #in the case that there is a new minimum distance value, removes cells with the previous minimum value distance
+                ties.append((x_cord, y_cord)) #adds location of minimum distance value in the board to the list
+            #in the case that there is a tie (current cells distance is equal to the minimum distance value in the board, adds current cell to list
             elif min_distance == distance:
                 ties.append((x_cord, y_cord))
         if len(ties)==1:
-            return ties[0]
+            return ties[0] #in the case that there is one cell whose distance is equivalent to the shortest distance to the current cell
         else:
-            return random.choice(ties)
-
+            return random.choice(ties) #in the case that there are multiple cells whose distance are equivalent to the shortest distance to the current cell
+        
+    #calculates possible next cells to go to after a bayesian update has been done and returns that list of cells
     def calculate_location(self, board):
-        location = ()
-        ties = []
-        max_val = 0.0
+        location = () #possible location to be added
+        ties = [] #list of cells to return 
+        max_val = 0.0 #intial probability value to compare
+        #iterates through whole board
         for i in range(0, self.dim):
             for j in range(0, self.dim):
                 if board[i][j] > max_val:
-                    max_val = board[i][j]
-                    location = (i, j)
-                    ties.clear()
-                    ties.append(location)
+                    max_val = board[i][j] #largest probability value in the board
+                    location = (i, j) #location of largest probability value in the board
+                    ties.clear() #in the case that there is a new largest probability value, removes cells with the previous largest value probability
+                    ties.append(location) #adds location of largest probability value in the board to the list
+                #in the case that there is a tie (current cells probability is equal to the largest probability value in the board, adds current cell to list   
                 elif board[i][j] == max_val:
-                    ties.append((i, j))
-        return ties
+                    ties.append((i, j)) 
+        return ties #returns list of possible next cells to go to
 
     def basic_agent(self,x,y):
-        x_cord=x
-        y_cord=y
-        moves_counted=0
-        distance=0
-        while self.target_found==False:
-            if (x_cord,y_cord)==self.target_info.location:
-                fnr=self.map_board[x_cord][y_cord].false_neg
-                rand=random.random()
+        x_cord=x #current cell x coordinate
+        y_cord=y #current cell y coordinate
+        moves_counted=0 #represents amount of moves done so far
+        distance=0  #represents distance covered so far
+        while self.target_found==False: #while the target has not been found
+            if (x_cord,y_cord)==self.target_info.location: #if current cell coordinates are equivalent to the target location
+                fnr=self.map_board[x_cord][y_cord].false_neg #false negative rate of current cell
+                rand=random.random() #generates random number between 0 and 1
                 if rand>fnr:
-                    moves_counted+=1
-                    self.target_found=True
-
+                    moves_counted+=1 #increments moves counted
+                    self.target_found=True #target has been found
+                #false negative situation
                 else:
                     self.previous_cells.append((x_cord,y_cord))
-                    moves_counted+=1
-                    self.bayesian_update(x_cord,y_cord)
-                    locations=self.calculate_location(self.belief_state)
+                    moves_counted+=1 #increments moves counted
+                    self.bayesian_update(x_cord,y_cord) #perform bayesian update on belief state
+                    locations=self.calculate_location(self.belief_state) #calculates list of possible next cells to go to
                     #print(locations)
-                    if len(locations)>1:
-                        location=self.clear_ties(locations,x_cord,y_cord)
-                        locations.clear()
-                        locations.append(location)
-                    coords=locations[0]
-                    distance+=abs(x_cord-coords[0])+abs(y_cord-coords[1])
-                    x_cord=coords[0]
-                    y_cord=coords[1]
+                    if len(locations)>1: #ties exist between cells in the list
+                        location=self.clear_ties(locations,x_cord,y_cord) #clears tie to return one possible next cell
+                        locations.clear() #clears list so that u can add the singular location to list
+                        locations.append(location) #add the next possible cell to go to list
+                    coords=locations[0] #gets coordinates for next possible cell to go to
+                    #adds its manhatten distance between current cell and next possible cell to go to to the cumulative distance
+                    distance+=abs(x_cord-coords[0])+abs(y_cord-coords[1]) 
+                    x_cord=coords[0] #new x coordinate to go to
+                    y_cord=coords[1] #new y coordinate to go to
+            #current cell corrdinates not equivalent to target location
             else:
                 self.previous_cells.append((x_cord, y_cord))
                 moves_counted += 1
@@ -163,12 +171,12 @@ class Basic_Agent_1:
                 distance += abs(x_cord - coords[0]) + abs(y_cord - coords[1])
                 x_cord = coords[0]
                 y_cord = coords[1]
-
+        #returns final result of moves and distance
         return moves_counted+distance
 
 def start_agent():
-    x = random.randint(0, 49)
-    y = random.randint(0, 49)
-    info = Basic_Agent_1(50)
-    return info.basic_agent(x, y)
+    x = random.randint(0, 49) #random x coordinate to start agent1
+    y = random.randint(0, 49) #random y coordinate to start agent1
+    info = Basic_Agent_1(50) #creating object named info for basic agent class with a dimension of 50
+    return info.basic_agent(x, y) #starts agent1
 
