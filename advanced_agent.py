@@ -94,7 +94,7 @@ class AgentClass:
         max_total = 0
         max_point = (0, 0)
 
-        alpha = (self.dim * self.dim) / (self.searches + (self.dim * self.dim))  # as we do more searches the importance of confidence decreases
+        alpha = (self.dim * self.dim) / (self.searches + (2 * self.dim * self.dim))  # as we do more searches the importance of confidence decreases
 
         for i in range(0, self.dim):
             for j in range(0, self.dim):
