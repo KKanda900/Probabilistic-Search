@@ -22,6 +22,7 @@ class AgentClass:
     distance_traveled = 0  # stores the distanced traveled from the current cell you start with
     num_searches = 0  # stores the number of searches made by the agent
     target_found = False
+    searches = 0
 
     # initialize information related to the the agent and the map itself
     def __init__(self, dim):
@@ -93,6 +94,8 @@ class AgentClass:
         max_total = 0
         max_point = (0, 0)
 
+        alpha = (self.dim * self.dim) / (self.searches + (self.dim * self.dim))  # as we do more searches the importance of confidence decreases
+
         for i in range(0, self.dim):
             for j in range(0, self.dim):
                 if (x, y) != (i, j):
@@ -102,35 +105,35 @@ class AgentClass:
                     if self.check_constraints(i + 1, j):
                         belief = self.belief_state[i + 1][j] / failure_prob
                         addition += belief
-                        addition += belief * (1 - self.map_board[i][j].false_neg)
+                        addition += belief * (1 - self.map_board[i][j].false_neg) * alpha  # add confidence
                     if self.check_constraints(i - 1, j):
                         belief = self.belief_state[i - 1][j] / failure_prob
                         addition += belief
-                        addition += belief * (1 - self.map_board[i][j].false_neg)
+                        addition += belief * (1 - self.map_board[i][j].false_neg) * alpha
                     if self.check_constraints(i + 1, j + 1):
                         belief = self.belief_state[i + 1][j + 1] / failure_prob
                         addition += belief
-                        addition += belief * (1 - self.map_board[i][j].false_neg)
+                        addition += belief * (1 - self.map_board[i][j].false_neg) * alpha
                     if self.check_constraints(i + 1, j - 1):
                         belief = self.belief_state[i + 1][j - 1] / failure_prob
                         addition += belief
-                        addition += belief * (1 - self.map_board[i][j].false_neg)
+                        addition += belief * (1 - self.map_board[i][j].false_neg) * alpha
                     if self.check_constraints(i - 1, j - 1):
                         belief = self.belief_state[i - 1][j - 1] / failure_prob
                         addition += belief
-                        addition += belief * (1 - self.map_board[i][j].false_neg)
+                        addition += belief * (1 - self.map_board[i][j].false_neg) * alpha
                     if self.check_constraints(i - 1, j + 1):
                         belief = self.belief_state[i - 1][j + 1] / failure_prob
                         addition += belief
-                        addition += belief * (1 - self.map_board[i][j].false_neg)
+                        addition += belief * (1 - self.map_board[i][j].false_neg) * alpha
                     if self.check_constraints(i, j + 1):
                         belief = self.belief_state[i][j + 1] / failure_prob
                         addition += belief
-                        addition += belief * (1 - self.map_board[i][j].false_neg)
+                        addition += belief * (1 - self.map_board[i][j].false_neg) * alpha
                     if self.check_constraints(i, j - 1):
                         belief = self.belief_state[i][j - 1] / failure_prob
                         addition += belief
-                        addition += belief * (1 - self.map_board[i][j].false_neg)
+                        addition += belief * (1 - self.map_board[i][j].false_neg) * alpha
 
                     if addition > max_total:
                         max_total = addition
@@ -141,6 +144,29 @@ class AgentClass:
                             max_point = (i, j)
 
         return max_point
+
+    def neighbors_list(self, x, y):
+
+        neighbors = []
+
+        if self.check_constraints(x + 1, y):
+            neighbors.append((x + 1, y))
+        if self.check_constraints(x - 1, y):
+            neighbors.append((x - 1, y))
+        if self.check_constraints(x + 1, y + 1):
+            neighbors.append((x + 1, y + 1))
+        if self.check_constraints(x + 1, y - 1):
+            neighbors.append((x + 1, y - 1))
+        if self.check_constraints(x - 1, y - 1):
+            neighbors.append((x - 1, y - 1))
+        if self.check_constraints(x - 1, y + 1):
+            neighbors.append((x - 1, y + 1))
+        if self.check_constraints(x, y + 1):
+            neighbors.append((x, y + 1))
+        if self.check_constraints(x, y - 1):
+            neighbors.append((x, y - 1))
+
+        return neighbors
 
     def test_moves(self, start_x, start_y, end_x, end_y):
         x = start_x
@@ -191,7 +217,32 @@ class AgentClass:
 
         while self.target_found is False:
 
+            self.searches = moves_counted
+
             moves_counted += 1
+
+            neighbors = self.neighbors_list(x_cord, y_cord)
+
+            for z in range(0, len(neighbors)):
+
+                check_cell = neighbors.pop()
+                moves_counted += 2  # moving + searching
+                fnr = self.map_board[check_cell[0]][check_cell[1]].false_neg
+                rand = random.random()
+                self.bayesian_update(check_cell[0], check_cell[1])
+                if check_cell == self.target_info.location and rand > fnr:
+                    self.target_found = True
+                    break
+                if self.map_board[check_cell[0]][check_cell[1]].terrain_type == "flat":  # if the cell is a flat terrain we check twice
+                    rand = random.random()
+                    self.bayesian_update(check_cell[0], check_cell[1])
+                    if check_cell == self.target_info.location and rand > fnr:
+                        moves_counted += 1
+                        self.target_found = True
+                        break
+
+            moves_counted += 1  # to return to current cell
+
             if (x_cord, y_cord) == self.target_info.location:
                 fnr = self.map_board[x_cord][y_cord].false_neg
                 rand = random.random()
@@ -207,6 +258,7 @@ class AgentClass:
                     self.bayesian_update(x_cord, y_cord)
                     next_cell = self.next_cell(x_cord, y_cord)
                     path_cells = self.test_moves(x_cord, y_cord, next_cell[0], next_cell[1])
+                    print(next_cell)
 
                     if len(path_cells) > 1:  # if there are cells in path that have beliefs of higher than 85% of the next cell we are going to search, we search the cell
 
@@ -216,11 +268,13 @@ class AgentClass:
                             moves_counted += 1
                             fnr = self.map_board[check_cell[0]][check_cell[1]].false_neg
                             rand = random.random()
+                            self.bayesian_update(check_cell[0], check_cell[1])
                             if check_cell == self.target_info.location and rand > fnr:
                                 self.target_found = True
                                 break
                             if self.map_board[check_cell[0]][check_cell[1]].terrain_type == "flat":  # if the cell is a flat terrain we check twice
                                 rand = random.random()
+                                self.bayesian_update(check_cell[0], check_cell[1])
                                 if check_cell == self.target_info.location and rand > fnr:
                                     moves_counted += 1
                                     self.target_found = True
@@ -234,6 +288,7 @@ class AgentClass:
                 self.bayesian_update(x_cord, y_cord)
                 next_cell = self.next_cell(x_cord, y_cord)
                 path_cells = self.test_moves(x_cord, y_cord, next_cell[0], next_cell[1])
+                print(next_cell)
 
                 if len(path_cells) > 1:  # if there are cells in path that have beliefs of higher than 85% of the next cell we are going to search, we search the cell
 
