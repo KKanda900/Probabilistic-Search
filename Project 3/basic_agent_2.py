@@ -36,7 +36,7 @@ class Basic_Agent_2:
     def generate_board(self):
         # generate all the locations
         for i in range(0, self.dim):
-            for j in range(0, self.dim):
+            for j in range(0, self.dim): 
                 # create every i,j instance with the Terrian or belief at t=0 respectively
                 self.map_board[i][j] = Terrians(i, j) # generated map default values
                 self.belief_state[i][j] = 1/(self.dim*self.dim) # generated belief state default values
