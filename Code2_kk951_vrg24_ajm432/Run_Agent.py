@@ -21,5 +21,5 @@ if __name__ == "__main__":
         basic_agent_1.start_agent()
     elif sys.argv[1] == 'ba2':
         basic_agent_2.start_agent()
-    else:
+    elif sys.argv[1] == 'adv':
         advanced_agent.start_agent()

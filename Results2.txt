@@ -1,7 +1,0 @@
-Basic Agent 1 Score for Target in flat: 397.3
-
-Basic Agent 1 Score for Target in caves: 3596.1
-
-Basic Agent 1 Score for Target in hilly: 7916.0
-
-Basic Agent 1 Score for Target in forested: 41.6
